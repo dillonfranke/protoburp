@@ -1,6 +1,7 @@
 import json
 import subprocess
 import inspect
+import base64
 
 from burp import IBurpExtender
 from burp import IHttpListener
@@ -73,43 +74,22 @@ class BurpExtender(IBurpExtender, IHttpListener):
 
 
 
-    def json_to_protobuf(self, json_body):
-        # proto_module = imp.load_source('GetMyMessages_pb2', self.suite_tab.selectedFilePath)
-        # loader = importlib.machinery.SourceFileLoader('GetMyMessages_pb2', self.suite_tab.selectedFilePath)
-        # proto_module = loader.load_module()
-        # spec = importlib.util.spec_from_file_location("module.name", self.selectedFilePath)
-        # proto_module = importlib.util.module_from_spec(spec)
-        # spec.loader.exec_module(proto_module)
+    def json_to_protobuf_in_python3(self, json_body):
+        # Prepare the command to run in Python 3
+        cmd = ["python3", os.path.join(_BASE_DIR, "protobuf-encoder.py"), "--json", json.dumps(json_body), "--protobuf_definition", str(self.suite_tab.selectedFilePath)]
 
-        sys.path.insert(0, os.path.dirname(self.suite_tab.selectedFilePath))
-        proto_module = __import__('GetMyMessages_pb2')
+        # Run the command
+        output = subprocess.check_output(cmd)
+        print("Received protobuf in Base64 format: " + output)
+        output = output.decode("utf-8")
+        print("Decoding UTF-8: " + output)
+        protobuf = base64.b64decode(output)
+        print(protobuf)
 
-        proto_msg = proto_module.GetMyMessages()
-        self.dict_to_protobuf(json_body, proto_msg)
-        encoded_protobuf = proto_msg.SerializeToString()
-        return encoded_protobuf
-
-    def dict_to_protobuf(self, msg, pb_obj):
-        for field_name, value in msg.items():
-            field = pb_obj.DESCRIPTOR.fields_by_name[field_name]
-            if field.type == field.TYPE_MESSAGE:
-                self.dict_to_protobuf(value, getattr(pb_obj, field_name))
-            elif field.type == field.TYPE_ENUM:
-                enum_value = field.enum_type.values_by_name[value].number
-                setattr(pb_obj, field_name, enum_value)
-            else:
-                setattr(pb_obj, field_name, value)
+        return protobuf
 
     # Implement IHttpListener methods
     def processHttpMessage(self, toolFlag, messageIsRequest, messageInfo):
-        # Get the directory of the currently running script
-
-        # Define the path for the new file
-        new_file_path = os.path.join(_BASE_DIR, "chickens")
-
-        # Create the new file
-        with open(new_file_path, "w") as file:
-            file.write(sys.version)
         # Only continue if the extension is enabled
         if not self.suite_tab.protoburp_enabled:
             return
@@ -150,7 +130,8 @@ class BurpExtender(IBurpExtender, IHttpListener):
         print("String converted to JSON object.")
 
         # Convert the JSON to Protobuf
-        protobuf = self.json_to_protobuf(json_body)
+        protobuf = self.json_to_protobuf_in_python3(json_body)
+        
         print("JSON converted to Protobuf.")
 
         # Create a new HTTP message with the Protobuf body
