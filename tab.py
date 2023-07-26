@@ -33,8 +33,6 @@ class Tab(ITab):
           3. Click the 'Choose File' button to select your compiled protobuf file.
           4. Check the 'Enable ProtoBurp' checkbox.
           5. All requests sent with the header `ProtoBurp: True` will then be converted from JSON to a Protobuf!
-        
-        For more information, please see my blog post here: https://dillonfrankesecurity.com
         """
         instructions = JTextArea(instructionText)
         instructions.setEditable(False)  # Make the text area non-editable

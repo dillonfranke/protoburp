@@ -78,10 +78,16 @@ class BurpExtender(IBurpExtender, IHttpListener):
         # Prepare the command to run in Python 3
         cmd = ["python3", os.path.join(_BASE_DIR, "protobuf-encoder.py"), "--json", json.dumps(json_body), "--protobuf_definition", str(self.suite_tab.selectedFilePath)]
 
+        output = ""
         # Run the command
-        output = subprocess.check_output(cmd)
+        try:
+            output = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            print("Subprocess exited with error (status code {}):".format(e.returncode))
+            print(e.output.decode())
+        
         print("Received protobuf in Base64 format: " + output)
-        output = output.decode("utf-8")
+        output = output.decode("utf-8").strip()
         print("Decoding UTF-8: " + output)
         protobuf = base64.b64decode(output)
         print(protobuf)
@@ -97,23 +103,29 @@ class BurpExtender(IBurpExtender, IHttpListener):
         if not messageIsRequest:
             return
 
-        print("Processing request.")
-
-        print("Processing HTTP message...")
-
-        print("Processing HTTP message...")
-
         # Get the HTTP service for the request
         httpService = messageInfo.getHttpService()
         print("HTTP Service obtained.")
 
         # Convert the request to a IRequestInfo object
         requestInfo = self._helpers.analyzeRequest(httpService, messageInfo.getRequest())
-        print("Request Info analyzed.")
-
-        # Get the headers of the request
+        
+        # requestInfo is an IRequestInfo object
         headers = requestInfo.getHeaders()
-        print("Headers extracted.")
+
+        # Convert header names to lower case for case-insensitive comparison
+        header_names = [header.split(":")[0].lower() for header in headers]
+
+        # Only process if the ProtoBurp header exists
+        if not "protoburp" in header_names:
+            print("ProtoBurp header not found")
+            return
+
+        print("Processing request.")
+
+        print("Processing HTTP message...")
+
+        print("Processing HTTP message...")
 
         # Get the body of the request
         body = messageInfo.getRequest()[requestInfo.getBodyOffset():]
