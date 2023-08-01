@@ -1,8 +1,16 @@
+import os
+import inspect
+import sys
+# Add correct directory to sys.path
+_BASE_DIR = os.path.abspath(
+    os.path.dirname(inspect.getfile(inspect.currentframe()))
+)
+
+sys.path.insert(0, _BASE_DIR + "/deps/protobuf/python/")
+
 from google.protobuf.json_format import MessageToJson
 import importlib
 import importlib.util
-import sys
-import os
 
 def set_placeholder_values(message):
     for field in message.DESCRIPTOR.fields:
@@ -21,7 +29,7 @@ def set_placeholder_values(message):
         elif field.type == field.TYPE_BYTES:
             setattr(message, field.name, b'example')
         elif field.type == field.TYPE_ENUM:
-            setattr(message, field.name, list(field.enum_type.values_by_name.keys())[0])
+            setattr(message, field.name, list(field.enum_type.values_by_name.values())[0].number)
         elif field.type == field.TYPE_MESSAGE:
             if field.label == field.LABEL_REPEATED:
                 nested_message = getattr(message, field.name).add()
@@ -41,7 +49,7 @@ def generate_example_json(protobuf_module, message_name):
     set_placeholder_values(message)
     
     # Convert the protobuf message to a JSON string and return it
-    return MessageToJson(message)
+    return MessageToJson(message, including_default_value_fields=True)
 
 def main():
     protobuf_definition_path = sys.argv[1]

@@ -1,0 +1,24 @@
+syntax = "proto3";
+package example;
+
+message UserProfile {
+  string username = 1;
+  int32 id = 2;
+  
+  message Address {
+    string street = 1;
+    string city = 2;
+    string state = 3;
+    string zip = 4;
+  }
+  
+  Address address = 3;
+  
+  message Contact {
+    string phone = 1;
+    string email = 2;
+  }
+  
+  repeated Contact contacts = 4;
+}
+

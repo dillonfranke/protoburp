@@ -1,0 +1,17 @@
+syntax = "proto3";
+package example;
+
+message Employee {
+  string name = 1;
+  int32 id = 2;
+  
+  enum JobTitle {
+    UNDEFINED = 0;
+    ENGINEER = 1;
+    MANAGER = 2;
+    DIRECTOR = 3;
+  }
+  
+  JobTitle title = 3;
+}
+
