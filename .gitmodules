@@ -1,6 +1,3 @@
-[submodule "deps/six"]
-	path = deps/six
-	url = https://github.com/benjaminp/six.git
 [submodule "deps/protobuf"]
 	path = deps/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git

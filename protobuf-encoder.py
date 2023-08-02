@@ -4,7 +4,6 @@ import argparse
 import json
 import base64
 import importlib.util
-import logging
 import inspect
 
 _BASE_DIR = os.path.abspath(
@@ -13,28 +12,6 @@ _BASE_DIR = os.path.abspath(
 sys.path.insert(0, _BASE_DIR + "/deps/protobuf/python/")
 from google.protobuf.json_format import Parse
 from google.protobuf.message import Message
-
-# Configure logging settings
-logging.basicConfig(
-    filename='/Users/dillon.franke/Tools/protoburp/exceptions.log',
-    filemode='a',  # Append to the file if it exists, create it otherwise
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    level=logging.ERROR,  # Log only error messages and above (e.g., critical)
-)
-
-# Custom exception hook to log unhandled exceptions
-def log_exception_hook(exc_type, exc_value, exc_traceback):
-    # Log the exception
-    logging.error(
-        "Uncaught exception",
-        exc_info=(exc_type, exc_value, exc_traceback)
-    )
-
-    # Call the default exception hook to print the exception to stderr
-    sys.__excepthook__(exc_type, exc_value, exc_traceback)
-
-# Set the custom exception hook as the global exception hook
-sys.excepthook = log_exception_hook
 
 def main():
     with open('log.txt', 'w') as logfile:
