@@ -74,9 +74,12 @@ def generate_example_json(protobuf_module, message_name):
     return MessageToJson(message, including_default_value_fields=True)
 
 def main():
-    protobuf_definition_path = sys.argv[1]
-    message_name = sys.argv[2]
-    
+    try:
+        protobuf_definition_path = sys.argv[1]
+        message_name = sys.argv[2]
+    except:
+        print("Usage: python3 json-generator.py <compiled_proto_definition_pb2.py> <MessageName>")
+        exit(1)    
     # Add the directory of protobuf_definition_path to sys.path
     sys.path.insert(0, os.path.dirname(os.path.abspath(protobuf_definition_path)))
     # Dynamically import the module

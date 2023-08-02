@@ -1,3 +1,13 @@
+import os
+import inspect
+import sys
+# Add correct directory to sys.path
+_BASE_DIR = os.path.abspath(
+    os.path.dirname(inspect.getfile(inspect.currentframe()))
+)
+
+sys.path.insert(0, _BASE_DIR + "/../deps/protobuf/python/")
+
 import json
 from flask import Flask, request
 from flask_restful import Resource, Api
