@@ -36,17 +36,6 @@ def log_exception_hook(exc_type, exc_value, exc_traceback):
 # Set the custom exception hook as the global exception hook
 sys.excepthook = log_exception_hook
 
-# def dict_to_protobuf(msg, pb_obj):
-#     for field_name, value in msg.items():
-#         field = pb_obj.DESCRIPTOR.fields_by_name[field_name]
-#         if field.type == field.TYPE_MESSAGE:
-#             dict_to_protobuf(value, getattr(pb_obj, field_name))
-#         elif field.type == field.TYPE_ENUM:
-#             enum_value = field.enum_type.values_by_name[value].number
-#             setattr(pb_obj, field_name, enum_value)
-#         else:
-#             setattr(pb_obj, field_name, value)
-
 def main():
     with open('log.txt', 'w') as logfile:
         
@@ -76,11 +65,9 @@ def main():
                 break
 
         # Convert JSON to protobuf
-        # json_body = json.loads(args.json)
         proto_msg = proto_class()
         logfile.write("Parsing JSON string into protobuf\n")
         Parse(args.json, proto_msg)
-        # dict_to_protobuf(json_body, proto_msg)
 
         logfile.write("Serializing protobuf structure to string\n")
         serialized_protobuf = proto_msg.SerializeToString()

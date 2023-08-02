@@ -14,31 +14,53 @@ import importlib.util
 
 def set_placeholder_values(message):
     for field in message.DESCRIPTOR.fields:
-        if field.type == field.TYPE_DOUBLE or field.type == field.TYPE_FLOAT:
-            setattr(message, field.name, 1.1)
-        elif field.type == field.TYPE_INT64 or field.type == field.TYPE_UINT64 or \
-                field.type == field.TYPE_INT32 or field.type == field.TYPE_FIXED64 or \
-                field.type == field.TYPE_FIXED32 or field.type == field.TYPE_UINT32 or \
-                field.type == field.TYPE_SFIXED32 or field.type == field.TYPE_SFIXED64 or \
-                field.type == field.TYPE_SINT32 or field.type == field.TYPE_SINT64:
-            setattr(message, field.name, 1)
-        elif field.type == field.TYPE_BOOL:
-            setattr(message, field.name, True)
-        elif field.type == field.TYPE_STRING:
-            setattr(message, field.name, 'example')
-        elif field.type == field.TYPE_BYTES:
-            setattr(message, field.name, b'example')
-        elif field.type == field.TYPE_ENUM:
-            setattr(message, field.name, list(field.enum_type.values_by_name.values())[0].number)
-        elif field.type == field.TYPE_MESSAGE:
-            if field.label == field.LABEL_REPEATED:
-                nested_message = getattr(message, field.name).add()
-                set_placeholder_values(nested_message)
-                nested_message = getattr(message, field.name).add()
-                set_placeholder_values(nested_message)
-            else:
-                nested_message = getattr(message, field.name)
-                set_placeholder_values(nested_message)
+        try:
+            if field.type == field.TYPE_DOUBLE or field.type == field.TYPE_FLOAT:
+                if field.label == field.LABEL_REPEATED:
+                    getattr(message, field.name).extend([1.1, 2.2])
+                else:
+                    setattr(message, field.name, 1.1)
+            elif field.type == field.TYPE_INT64 or field.type == field.TYPE_UINT64 or \
+                    field.type == field.TYPE_INT32 or field.type == field.TYPE_FIXED64 or \
+                    field.type == field.TYPE_FIXED32 or field.type == field.TYPE_UINT32 or \
+                    field.type == field.TYPE_SFIXED32 or field.type == field.TYPE_SFIXED64 or \
+                    field.type == field.TYPE_SINT32 or field.type == field.TYPE_SINT64:
+                if field.label == field.LABEL_REPEATED:
+                    getattr(message, field.name).extend([1, 2])
+                else:
+                    setattr(message, field.name, 1)
+            elif field.type == field.TYPE_BOOL:
+                if field.label == field.LABEL_REPEATED:
+                    getattr(message, field.name).extend([True, False])
+                else:
+                    setattr(message, field.name, True)
+            elif field.type == field.TYPE_STRING:
+                if field.label == field.LABEL_REPEATED:
+                    getattr(message, field.name).extend(['example1', 'example2'])
+                else:
+                    setattr(message, field.name, 'example')
+            elif field.type == field.TYPE_BYTES:
+                if field.label == field.LABEL_REPEATED:
+                    getattr(message, field.name).extend([b'example1', b'example2'])
+                else:
+                    setattr(message, field.name, b'example')
+            elif field.type == field.TYPE_ENUM:
+                if field.label == field.LABEL_REPEATED:
+                    getattr(message, field.name).extend([list(field.enum_type.values_by_name.values())[i].number for i in range(2)])
+                else:
+                    setattr(message, field.name, list(field.enum_type.values_by_name.values())[0].number)
+
+            elif field.type == field.TYPE_MESSAGE:
+                if field.label == field.LABEL_REPEATED:
+                    nested_message = getattr(message, field.name).add()
+                    set_placeholder_values(nested_message)
+                    nested_message = getattr(message, field.name).add()
+                    set_placeholder_values(nested_message)
+                else:
+                    nested_message = getattr(message, field.name)
+                    set_placeholder_values(nested_message)
+        except Exception as e:
+            sys.stderr.write(f"Had an issue with the {field.name} field, so keeping it uninitialized...")
 
 def generate_example_json(protobuf_module, message_name):
     # Get the protobuf message class
@@ -61,7 +83,8 @@ def main():
     protobuf_module = importlib.import_module(os.path.splitext(os.path.basename(protobuf_definition_path))[0])
     
     # Generate and print an example JSON object
-    print(generate_example_json(protobuf_module, message_name))
+    json_obj = generate_example_json(protobuf_module, message_name)
+    print(json_obj)
 
 if __name__ == '__main__':
     main()

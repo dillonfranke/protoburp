@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package complex;
+
+message ComplexMessage {
+  int32 id = 1;
+
+  message SubMessage {
+    string name = 1;
+    int64 timestamp = 2;
+    bytes data = 3;
+
+    enum SubEnum {
+      UNKNOWN = 0;
+      FIRST = 1;
+      SECOND = 2;
+    }
+    SubEnum state = 4;
+
+    message NestedMessage {
+      float percentage = 1;
+      string status = 2;
+    }
+    NestedMessage details = 5;
+  }
+  SubMessage sub = 2;
+
+  enum EnumType {
+    UNDEFINED = 0;
+    TYPE_A = 1;
+    TYPE_B = 2;
+  }
+  EnumType type = 3;
+
+  repeated int32 numbers = 4;
+  map<string, SubMessage> mappings = 5;
+}
+
