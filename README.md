@@ -40,6 +40,11 @@ protoc --python_out=. addressbook.proto
 ```
 
 ### 2. Load the `ProtoBurp` extension and select your compiled `.proto` file
+
+<img src="images/burp-installation.png" height="200">
+
+<img src="images/burp-installation-final.png" height="200">
+
 - Click 'Enable ProtoBurp'
 - Select the Python Protobuf definition file you just compiled
 
