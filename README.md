@@ -4,13 +4,13 @@ Check out my blog post detailing the wonderful things you can do with `ProtoBurp
 ## Description
 `ProtoBurp` is a Burp Suite extension that enables security researchers to encode and fuzz custom Protobuf messages. It allows users to automatically convert JSON data into a Protobuf message based on a provided protobuf definition file. This opens up opportunities for fuzzing inputs using Burp's Repeater and Intruder tools, as well as proxy traffic from other tools (e.g. `sqlmap`).
 
-## Installation and Usage
+## Installation
 
 ### 1. Clone the `ProtoBurp` repository and its submodules
 ```bash
-git clone --recurse-submodules https://github.com/dillonfranke/protoburp.git
+git clone --recursive https://github.com/dillonfranke/protoburp.git
 ```
-> Make sure to add the `--recurse-submodules` option
+> Make sure to add the `--recursive` option
 ### 2. Install the `protoc` utility, which you'll need to compile Protobuf defintion (`.proto`) files
 Mac:
 ```bash
@@ -24,19 +24,28 @@ sudo apt-get install protobuf-compiler
 Windows:
 https://github.com/protocolbuffers/protobuf/releases
 
-### 3. Compile the `.proto` file you want to convert into Python format
+### 3. Run the `setup.sh` script
+This will install Google's `protobuf` module so it can be used by the extension
+```bash
+chmod +x ./setup.sh
+./setup.sh
+```
+
+## Usage
+
+### 1. Compile the `.proto` file you want to convert into Python format
 > Several example `.proto` files are contained in the `test_app` folder
 ```bash
 protoc --python_out=. addressbook.proto
 ```
 
-### 4. Load the `ProtoBurp` extension and select your compiled `.proto` file
+### 2. Load the `ProtoBurp` extension and select your compiled `.proto` file
 - Click 'Enable ProtoBurp'
 - Select the Python Protobuf definition file you just compiled
 
 <img src="images/protoburp-extension-tab.png" height="250">
 
-### 5. Set the `ProtoBurp` header on your requests, and your requests will be transformed from JSON to Protobuf!
+### 3. Set the `ProtoBurp` header on your requests, and your requests will be transformed from JSON to Protobuf!
 <img src="images/protoburp-transformation.png" height="400">
 
 ### Generating a JSON payload
