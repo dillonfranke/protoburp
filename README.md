@@ -27,8 +27,7 @@ https://github.com/protocolbuffers/protobuf/releases
 ### 3. Run the `setup.sh` script
 This will install Google's `protobuf` module so it can be used by the extension
 ```bash
-chmod +x ./setup.sh
-./setup.sh
+sudo ./setup.sh
 ```
 
 ## Usage
