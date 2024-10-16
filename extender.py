@@ -2,6 +2,7 @@ import json
 import subprocess
 import inspect
 import base64
+from struct import pack
 
 from burp import IBurpExtender
 from burp import IHttpListener
@@ -66,11 +67,15 @@ class BurpExtender(IBurpExtender, IHttpListener):
         except subprocess.CalledProcessError as e:
             print("Subprocess exited with error (status code {}):".format(e.returncode))
             print(e.output.decode())
-        
         output = output.decode("utf-8").strip()
         protobuf = base64.b64decode(output)
 
         return protobuf
+    
+    def int_to_bytes(n, length, byteorder='big'):
+        h = '%x' % n
+        s = ('0'*(len(h) % 2) + h).zfill(length*2).decode('hex')
+        return s
 
     # Implement IHttpListener methods
     def processHttpMessage(self, toolFlag, messageIsRequest, messageInfo):
@@ -103,6 +108,19 @@ class BurpExtender(IBurpExtender, IHttpListener):
         json_body = json.loads(body_string)
         # Convert the JSON to Protobuf
         protobuf = self.json_to_protobuf_in_python3(json_body)
+       
+        #For header value that contains application/grpc content type
+        if any("application/grpc" in header.lower() for header in headers):
+            # Calculate the length of the serialized message.
+            message_length = len(protobuf)
+
+            # Create the gRPC message header.
+            # It consists of a compressed flag (0 for uncompressed) and the message length.
+            grpc_header = pack('>B', 0) + pack('>I', message_length)
+
+            # Concatenate the header and the serialized message.
+            protobuf = grpc_header + protobuf
+            
         # Create a new HTTP message with the Protobuf body
         new_message = self._helpers.buildHttpMessage(headers, protobuf)
         # Update the request in the messageInfo object
