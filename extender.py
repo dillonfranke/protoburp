@@ -72,11 +72,6 @@ class BurpExtender(IBurpExtender, IHttpListener):
 
         return protobuf
     
-    def int_to_bytes(n, length, byteorder='big'):
-        h = '%x' % n
-        s = ('0'*(len(h) % 2) + h).zfill(length*2).decode('hex')
-        return s
-
     # Implement IHttpListener methods
     def processHttpMessage(self, toolFlag, messageIsRequest, messageInfo):
         # Only continue if the extension is enabled
