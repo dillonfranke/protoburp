@@ -71,7 +71,7 @@ def generate_example_json(protobuf_module, message_name):
     set_placeholder_values(message)
     
     # Convert the protobuf message to a JSON string and return it
-    return MessageToJson(message, including_default_value_fields=True)
+    return MessageToJson(message, preserving_proto_field_name=True)
 
 def main():
     try:
